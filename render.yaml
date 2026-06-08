@@ -1,0 +1,142 @@
+# Postiz Deployment Blueprint for Render
+# Docs: https://docs.render.com/blueprint-spec
+#
+# BEFORE DEPLOYING:
+# 1. Create a free Temporal Cloud account at https://temporal.io/cloud
+#    (free tier: 10K actions/month, 50 concurrent workflows)
+# 2. Add the Temporal address as an environment variable in the Render dashboard
+#    or uncomment and fill in the TEMPORAL_ADDRESS below.
+# 3. Set MAIN_URL / FRONTEND_URL / NEXT_PUBLIC_BACKEND_URL to your Render domain.
+
+services:
+  # Main Postiz Web Application (bundled frontend + backend)
+  # Uses the official Postiz Docker image
+  - type: web
+    name: postiz-app
+    runtime: docker
+    image:
+      url: ghcr.io/gitroomhq/postiz-app:latest
+    plan: starter
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: postiz-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: postiz-redis
+          property: connectionString
+      - key: MAIN_URL
+        sync: false  # Set to your Render domain, e.g. https://postiz-app.onrender.com
+      - key: FRONTEND_URL
+        sync: false  # Same as MAIN_URL
+      - key: NEXT_PUBLIC_BACKEND_URL
+        sync: false  # e.g. https://postiz-app.onrender.com/api
+      - key: BACKEND_INTERNAL_URL
+        value: http://localhost:3000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: TEMPORAL_ADDRESS
+        sync: false  # Required: your Temporal Cloud endpoint or self-hosted Temporal address
+      - key: IS_GENERAL
+        value: 'true'
+      - key: STORAGE_PROVIDER
+        value: local
+      - key: UPLOAD_DIRECTORY
+        value: /uploads
+      - key: NEXT_PUBLIC_UPLOAD_DIRECTORY
+        value: /uploads
+      - key: DISABLE_REGISTRATION
+        value: 'false'
+      - key: API_LIMIT
+        value: '30'
+      - key: FEE_AMOUNT
+        value: '0.05'
+      - key: NX_ADD_PLUGINS
+        value: 'false'
+    disk:
+      name: uploads
+      mountPath: /uploads
+      sizeGB: 5
+    healthCheckPath: /
+
+  # Optional: Self-hosted Temporal Server (advanced)
+  # If you prefer not to use Temporal Cloud, uncomment the services below.
+  # Note: This requires at least a Standard plan for sufficient memory.
+  #
+  # - type: pserv
+  #   name: temporal-postgres
+  #   runtime: docker
+  #   image:
+ #     url: postgres:16
+  #   envVars:
+  #     - key: POSTGRES_USER
+  #       value: temporal
+  #     - key: POSTGRES_PASSWORD
+  #       generateValue: true
+  #     - key: POSTGRES_DB
+  #       value: temporal
+  #   disk:
+  #     name: temporal-data
+  #     mountPath: /var/lib/postgresql/data
+  #     sizeGB: 10
+  #
+  # - type: pserv
+  #   name: temporal-elasticsearch
+  #   runtime: docker
+  #   image:
+  #     url: elasticsearch:7.17.27
+  #   envVars:
+  #     - key: discovery.type
+  #       value: single-node
+  #     - key: ES_JAVA_OPTS
+  #       value: '-Xms256m -Xmx256m'
+  #     - key: xpack.security.enabled
+  #       value: 'false'
+  #     - key: cluster.routing.allocation.disk.threshold_enabled
+  #       value: 'true'
+  #     - key: cluster.routing.allocation.disk.watermark.low
+  #       value: 512mb
+  #     - key: cluster.routing.allocation.disk.watermark.high
+  #       value: 256mb
+  #     - key: cluster.routing.allocation.disk.watermark.flood_stage
+  #       value: 128mb
+  #
+  # - type: pserv
+  #   name: temporal-server
+  #   runtime: docker
+  #   image:
+  #     url: temporalio/auto-setup:1.28.1
+  #   envVars:
+  #     - key: DB
+  #       value: postgres12
+  #     - key: DB_PORT
+  #       value: '5432'
+  #     - key: POSTGRES_USER
+  #       value: temporal
+  #     - key: POSTGRES_PWD
+  #       sync: false
+  #     - key: POSTGRES_SEEDS
+  #       value: temporal-postgres
+  #     - key: DYNAMIC_CONFIG_FILE_PATH
+  #       value: config/dynamicconfig/development-sql.yaml
+  #     - key: ENABLE_ES
+  #       value: 'true'
+  #     - key: ES_SEEDS
+  #       value: temporal-elasticsearch
+  #     - key: ES_VERSION
+  #       value: v7
+  #     - key: TEMPORAL_NAMESPACE
+  #       value: default
+
+databases:
+  - name: postiz-db
+    databaseName: postiz
+    user: postiz
+    plan: starter
+
+redis:
+  - name: postiz-redis
+    plan: free
+    ipAllowList: []
