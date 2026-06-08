@@ -38,7 +38,13 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: TEMPORAL_ADDRESS
-        sync: false  # Required: your Temporal Cloud endpoint or self-hosted Temporal address
+        sync: false  # Required: your Temporal Cloud endpoint (e.g. namespace.xxx.tmprl.cloud:7233)
+      - key: TEMPORAL_TLS
+        value: 'true'  # Required for Temporal Cloud
+      - key: TEMPORAL_API_KEY
+        sync: false  # Required: your Temporal Cloud API key
+      - key: TEMPORAL_NAMESPACE
+        sync: false  # Required: your Temporal Cloud namespace name
       - key: IS_GENERAL
         value: 'true'
       - key: STORAGE_PROVIDER
