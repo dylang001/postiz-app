@@ -14,8 +14,6 @@ services:
   - type: web
     name: postiz-app
     runtime: docker
-    image:
-      url: ghcr.io/gitroomhq/postiz-app:latest
     plan: starter
     envVars:
       - key: DATABASE_URL
@@ -67,74 +65,8 @@ services:
       sizeGB: 5
     healthCheckPath: /
 
-  # Optional: Self-hosted Temporal Server (advanced)
-  # If you prefer not to use Temporal Cloud, uncomment the services below.
-  # Note: This requires at least a Standard plan for sufficient memory.
-  #
-  # - type: pserv
-  #   name: temporal-postgres
-  #   runtime: docker
-  #   image:
- #     url: postgres:16
-  #   envVars:
-  #     - key: POSTGRES_USER
-  #       value: temporal
-  #     - key: POSTGRES_PASSWORD
-  #       generateValue: true
-  #     - key: POSTGRES_DB
-  #       value: temporal
-  #   disk:
-  #     name: temporal-data
-  #     mountPath: /var/lib/postgresql/data
-  #     sizeGB: 10
-  #
-  # - type: pserv
-  #   name: temporal-elasticsearch
-  #   runtime: docker
-  #   image:
-  #     url: elasticsearch:7.17.27
-  #   envVars:
-  #     - key: discovery.type
-  #       value: single-node
-  #     - key: ES_JAVA_OPTS
-  #       value: '-Xms256m -Xmx256m'
-  #     - key: xpack.security.enabled
-  #       value: 'false'
-  #     - key: cluster.routing.allocation.disk.threshold_enabled
-  #       value: 'true'
-  #     - key: cluster.routing.allocation.disk.watermark.low
-  #       value: 512mb
-  #     - key: cluster.routing.allocation.disk.watermark.high
-  #       value: 256mb
-  #     - key: cluster.routing.allocation.disk.watermark.flood_stage
-  #       value: 128mb
-  #
-  # - type: pserv
-  #   name: temporal-server
-  #   runtime: docker
-  #   image:
-  #     url: temporalio/auto-setup:1.28.1
-  #   envVars:
-  #     - key: DB
-  #       value: postgres12
-  #     - key: DB_PORT
-  #       value: '5432'
-  #     - key: POSTGRES_USER
-  #       value: temporal
-  #     - key: POSTGRES_PWD
-  #       sync: false
-  #     - key: POSTGRES_SEEDS
-  #       value: temporal-postgres
-  #     - key: DYNAMIC_CONFIG_FILE_PATH
-  #       value: config/dynamicconfig/development-sql.yaml
-  #     - key: ENABLE_ES
-  #       value: 'true'
-  #     - key: ES_SEEDS
-  #       value: temporal-elasticsearch
-  #     - key: ES_VERSION
-  #       value: v7
-  #     - key: TEMPORAL_NAMESPACE
-  #       value: default
+  # Note: Self-hosted Temporal Server requires additional Private Services.
+  # See docs.postiz.com for advanced deployment options.
 
 databases:
   - name: postiz-db
