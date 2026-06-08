@@ -69,4 +69,4 @@ databases:
   - name: postiz-db
     databaseName: postiz
     user: postiz
-    plan: standard
+    plan: basic-256mb
