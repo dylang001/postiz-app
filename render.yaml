@@ -23,11 +23,11 @@ services:
       - key: REDIS_URL
         sync: false  # e.g. redis://redis-instance.render.com:6379 (create in Render dashboard or use Upstash)
       - key: MAIN_URL
-        sync: false  # Set to your Render domain, e.g. https://postiz-app.onrender.com
+        value: https://postiz-app-1k5o.onrender.com
       - key: FRONTEND_URL
-        sync: false  # Same as MAIN_URL
+        value: https://postiz-app-1k5o.onrender.com
       - key: NEXT_PUBLIC_BACKEND_URL
-        sync: false  # e.g. https://postiz-app.onrender.com/api
+        value: https://postiz-app-1k5o.onrender.com/api
       - key: BACKEND_INTERNAL_URL
         value: http://localhost:3000
       - key: JWT_SECRET
