@@ -14,7 +14,7 @@ services:
   - type: web
     name: postiz-app
     runtime: docker
-    plan: starter
+    plan: standard
     envVars:
       - key: DATABASE_URL
         fromDatabase:
